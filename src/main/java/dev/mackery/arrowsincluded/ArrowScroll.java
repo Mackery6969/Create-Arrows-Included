@@ -1,16 +1,14 @@
 package dev.mackery.arrowsincluded;
 
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+
+import com.mojang.logging.LogUtils;
 
 import dev.mackery.arrowsincluded.mixin.MouseHandlerInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
 
 /**
  * Turns arrow key presses into mouse wheel scrolls while Alt (or a mouse button) is held.
@@ -20,8 +18,9 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
  * vanilla's own {@code MouseHandler#onScroll}, so every mod that reacts to scrolling, via events
  * or mixins, sees it exactly like a real wheel tick.
  */
-@EventBusSubscriber(modid = ArrowsIncluded.MOD_ID, value = Dist.CLIENT)
 public final class ArrowScroll {
+
+	private static final Logger LOGGER = LogUtils.getLogger();
 
 	private static final String CREATE_WRENCH_MENU = "com.simibubi.create.content.contraptions.wrench.RadialWrenchMenu";
 
@@ -34,29 +33,34 @@ public final class ArrowScroll {
 		return synthetic;
 	}
 
-	@SubscribeEvent
-	public static void onKey(InputEvent.Key event) {
-		// Screens are handled in onScreenKey, before the screen uses the arrows for widget navigation
-		if (Minecraft.getInstance().screen != null || event.getAction() == GLFW.GLFW_RELEASE)
-			return;
-		int direction = scrollDirection(event.getKey());
-		if (direction != 0 && isTriggerHeld())
-			scroll(direction);
-	}
+	/**
+	 * Called at the start of every key event. Returns true when the key was turned into a scroll
+	 * and should not be processed any further.
+	 */
+	public static boolean onKey(long windowPointer, int key, int action, int modifiers) {
+		int direction = scrollDirection(key);
+		if (direction == 0 || action == GLFW.GLFW_RELEASE)
+			return false;
 
-	@SubscribeEvent
-	public static void onScreenKey(ScreenEvent.KeyPressed.Pre event) {
-		int direction = scrollDirection(event.getKeyCode());
-		if (direction == 0)
-			return;
-		Screen screen = event.getScreen();
-		if (screen.getFocused() instanceof EditBox)
-			return;
+		Minecraft mc = Minecraft.getInstance();
+		if (windowPointer != mc.getWindow().getWindow())
+			return false;
+
+		Screen screen = mc.screen;
+		boolean altHeld = (modifiers & GLFW.GLFW_MOD_ALT) != 0 || Screen.hasAltDown();
+		boolean mouseHeld = isMouseButtonHeld(windowPointer);
+		boolean wrenchMenu = screen != null && screen.getClass().getName().equals(CREATE_WRENCH_MENU);
+		LOGGER.debug("Arrow key {} (action {}, modifiers {}): alt={}, mouse={}, screen={}", key, action, modifiers, altHeld, mouseHeld,
+			screen == null ? "none" : screen.getClass().getName());
+
+		if (screen != null && screen.getFocused() instanceof EditBox)
+			return false;
 		// Create's wrench menu is held open by its own (rebindable) key, so it doesn't need Alt
-		if (!isTriggerHeld() && !screen.getClass().getName().equals(CREATE_WRENCH_MENU))
-			return;
+		if (!altHeld && !mouseHeld && !wrenchMenu)
+			return false;
+
 		scroll(direction);
-		event.setCanceled(true);
+		return true;
 	}
 
 	/**
@@ -71,11 +75,9 @@ public final class ArrowScroll {
 		};
 	}
 
-	private static boolean isTriggerHeld() {
-		long window = Minecraft.getInstance().getWindow().getWindow();
-		// A held mouse button covers "click and scroll" controls, e.g. Simulated's physics staff and handles
-		return Screen.hasAltDown()
-			|| GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS
+	/** A held mouse button covers "click and scroll" controls, e.g. Simulated's physics staff and handles. */
+	private static boolean isMouseButtonHeld(long window) {
+		return GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS
 			|| GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS
 			|| GLFW.glfwGetMouseButton(window, GLFW.GLFW_MOUSE_BUTTON_MIDDLE) == GLFW.GLFW_PRESS;
 	}

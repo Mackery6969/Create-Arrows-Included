@@ -5,6 +5,7 @@
   "plugin": "dev.mackery.arrowsincluded.ArrowsIncludedMixinPlugin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "KeyboardHandlerMixin",
     "MouseHandlerInvoker",
     "RadialToolboxMenuMixin"
   ],
