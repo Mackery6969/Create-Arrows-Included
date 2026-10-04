@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.mackery.arrowsincluded.mixin",
+  "plugin": "dev.mackery.arrowsincluded.ArrowsIncludedMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "MouseHandlerInvoker",
+    "RadialToolboxMenuMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

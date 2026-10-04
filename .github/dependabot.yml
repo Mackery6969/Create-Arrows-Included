@@ -1,0 +1,86 @@
+version: 2
+
+updates:
+  # Gradle dependencies
+  - package-ecosystem: "gradle"
+    directory: "/"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/Chicago"
+
+    open-pull-requests-limit: 10
+
+    labels:
+      - "dependencies"
+      - "automation"
+
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+    groups:
+      minor-and-patch-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+    ignore:
+      - dependency-name: "net.neoforged:*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "net.neoforged.moddev*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "ca.weblite:*"
+      - dependency-name: "com.github.oshi:*"
+      - dependency-name: "com.google.code.gson:*"
+      - dependency-name: "com.google.guava:*"
+      - dependency-name: "com.ibm.icu:*"
+      - dependency-name: "com.mojang:*"
+      - dependency-name: "commons-codec:*"
+      - dependency-name: "commons-io:*"
+      - dependency-name: "commons-logging:*"
+      - dependency-name: "io.netty:*"
+      - dependency-name: "it.unimi.dsi:*"
+      - dependency-name: "net.java.dev.jna:*"
+      - dependency-name: "net.minecrell:*"
+      - dependency-name: "net.sf.jopt-simple:*"
+      - dependency-name: "org.apache.commons:*"
+      - dependency-name: "org.apache.httpcomponents:*"
+      - dependency-name: "org.apache.logging.log4j:*"
+      - dependency-name: "org.codehaus.plexus:*"
+      - dependency-name: "org.jcraft:*"
+      - dependency-name: "org.jline:*"
+      - dependency-name: "org.joml:*"
+      - dependency-name: "org.lwjgl:*"
+      - dependency-name: "org.lz4:*"
+      - dependency-name: "org.slf4j:*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:30"
+      timezone: "America/Chicago"
+
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automation"
+
+    commit-message:
+      prefix: "ci"
+
+    groups:
+      github-actions:
+        patterns:
+          - "*"

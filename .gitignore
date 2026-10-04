@@ -1,0 +1,38 @@
+# enviroment variables
+.env
+
+# intellij idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# eclipse
+eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# vscode
+.vscode
+
+# gradle
+build
+.gradle
+
+# generated data, per Minecraft version
+/src/generated/*/resources/.cache/
+/src/generated/*/resources/.wiki_data/
+/src/generated/*/resources/.wiki_content/
+
+# local maven publish target
+repo
+
+# other
+run
+runs
+logs

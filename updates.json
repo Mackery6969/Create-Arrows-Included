@@ -1,0 +1,10 @@
+{
+  "homepage": "https://github.com/Mackery6969/Create--Arrows-Included",
+  "1.21.1": {
+    "1.0.0": "Initial release. Hold Alt and press the arrow keys to scroll in Create's ALT menus."
+  },
+  "promos": {
+    "1.21.1-latest": "1.0.0",
+    "1.21.1-recommended": "1.0.0"
+  }
+}
