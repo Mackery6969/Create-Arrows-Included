@@ -226,7 +226,7 @@ jobs:
 
     steps:
       - name: Download jars
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: release-jars
           path: dist
@@ -257,7 +257,7 @@ jobs:
 
     steps:
       - name: Download jars
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: release-jars
           path: dist
